@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 // define the home page route
-router.get('/', function (req, res) {
-res.send('Birds home page')
-})
+const ProductController = require('../controller/ProductController');
+router.post('/' ,ProductController.create);
   
   
 module.exports = router
