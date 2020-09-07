@@ -30,7 +30,7 @@ exports.deletar = (req, res) => {
         produto.preco = 30.00;
         res.json(produto);
     }
-    else {
+    else { 
         res.sendStatus(404);
     }
 }
