@@ -4,8 +4,8 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const ProductRoutes = require('./routes/ProductRoutes');
-app.use('/produtos', ProductRoutes);
+const TaskRoutes = require('./routes/TaskRoutes');
+app.use('/task', TaskRoutes);
 
 
 //route
