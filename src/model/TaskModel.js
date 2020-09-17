@@ -2,6 +2,10 @@ const mongoose = require('../config/db');
 const Schema = mongoose.Schema;
 
 const TaskSchema = new Schema({
+    macaddress: { 
+        type: String, 
+        required: true
+    }, //endereço fisico
     type: {
         type: Number,
          required: true
