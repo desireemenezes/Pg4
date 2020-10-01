@@ -2,11 +2,18 @@ const UserModel = require('../model/UserModel');
 
 const UserValidation = async (req, res, next) => {
 
-  const { macaddress } = req.body;
+  const { macaddress, user, email, password } = req.body; //crio uma constante de desestruturação
 
-  if(!macaddress) {
+  if(!macaddress) 
   return res.status(400).json({ error: 'macaddress é obrigatório'});
-  } else {
+  else if(!user)
+  return res.status(400).json({ error: 'usuário obrigatório'});
+  else if(!email)
+  return res.status(400).json({ error: 'e-mail obrigatório'});
+  else if(!password)
+  return res.status(400).json({ error: 'password obrigatório'});
+  
+   else {
     
     let exists;
     if(req.params.id){

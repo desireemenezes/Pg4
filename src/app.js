@@ -12,5 +12,5 @@ app.use('/user', UserRoutes);
 
 
 //route
-app.listen(9000, () => console.log('Rodando na porta 9000'));
+app.listen(5000, () => console.log('Rodando na porta 5000'));
 

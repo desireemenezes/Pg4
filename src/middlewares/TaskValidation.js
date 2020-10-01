@@ -1,9 +1,10 @@
 const TaskModel = require('../model/TaskModel');
 const { isPast } = require('date-fns');
 
-const TaskValidation = async (req, res, next) => {
+// macaddress é o dendereço fisico para capturar o dispositivo requerido
+const TaskValidation = async (req, res, next) => { // aqui eu crio uma função async que recebe os parametros req res next
 
-  const { macaddress, type, title, description, when } = req.body;
+  const { macaddress, type, title, description, when } = req.body; //crio uma constante de desestruturação
 
   if(!macaddress)
   return res.status(400).json({ error: 'macaddress é obrigatório'});
@@ -15,17 +16,17 @@ const TaskValidation = async (req, res, next) => {
   return res.status(400).json({ error: 'Descrição é obrigatória'});
   else if(!when)
   return res.status(400).json({ error: 'Data e Hora são obrigatórios'});
-  else if(isPast(new Date(when)))
+  else if(isPast(new Date(when))) //isPast verifica se a data esta no passado
   return res.status(400).json({ error: 'escolha uma data e hora futura'});
   
-  else{
+  else {
     let exists;
     if(req.params.id){
         exists = await TaskModel.
             findOne(
               { 
                 '_id': {'$ne': req.params.id},
-                'when': {'$eq': new Date(when)},  
+                'when': {'$eq': new Date(when)},  // when data e hora junto
                 'macaddress': {'$in': macaddress}
               });
         
