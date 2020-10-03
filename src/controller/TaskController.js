@@ -28,7 +28,8 @@ class TaskController {
     }
   
     async update(req, res){
-        await TaskModel.findByIdAndUpdate({'_id': req.params.id}, req.body, { new: true })
+        // { new: true } devolve a tarefa já atualizada
+        await TaskModel.findByIdAndUpdate({'_id': req.params.id}, req.body, { new: true }) // procura uma tarefa pelo id no parametro da requisição
         .then(response => {
             return res.status(200).json(response);
         })
@@ -39,8 +40,9 @@ class TaskController {
     }
   
     async all(req, res){
-         await TaskModel.find({'macaddress': {'$in': req.params.macaddress}})
-        .sort('when')
+        // operador $in só para valores que existem
+         await TaskModel.find({'macaddress': {'$in': req.params.macaddress}})// vou dar um find pra filtrar pelo macaddress pra mostrar as tarefas somente deste dispositivo
+        .sort('when') // trazer organizado por data e hora
         .then(response => {
             return res.status(200).json(response);
         })
@@ -50,7 +52,7 @@ class TaskController {
     }
 
     async show(req, res){
-        await TaskModel.findById(req.params.id)
+        await TaskModel.findById(req.params.id) // procura a tarefa pelo id
         .then(response => {
           response ? res.status(200).json(response) : res.status(404).json({error: 'tarefa não encontrada'})
         })
@@ -60,7 +62,7 @@ class TaskController {
     }
 
     async delete(req, res){
-        await TaskModel.deleteOne({'_id': req.params.id})
+        await TaskModel.deleteOne({'_id': req.params.id}) // deletar baseado no id "_id"
         .then(response => {
             return res.status(200).json(response);
         })
@@ -69,11 +71,11 @@ class TaskController {
         });
     }
 
-    async done(req, res){
+    async done(req, res){ // atualiza status da tarefa
         await TaskModel.findByIdAndUpdate(
-            {'_id': req.params.id},
-            {'done': req.params.done},
-            {new: true})
+            {'_id': req.params.id}, //passa o id pro parametro
+            {'done': req.params.done}, // informo qual o campo que eu quero atualizar
+            {new: true}) // vou passar ele como new, pra devolver atualizado
             .then(response => {
                 return res.status(200).json(response);
             })
@@ -82,10 +84,24 @@ class TaskController {
             });
     }
 
-    async late(req, res){
+    async late(req, res){ // tarefas atarssadas
         await TaskModel.find({
-            'when': {'$lt': current}, // last then '$lt' menor do que 
-            'macaddress': {'$in': req.params.macaddress}
+            'when': {'$lt': current}, // last then '$lt' menor do que  a data atual (curent)
+            'macaddress': {'$in': req.params.macaddress} //  vou dar um find pra filtrar pelo macaddress pra mostrar as tarefas somente deste dispositivo
+            })
+            .sort('when') // devolve organizado por data e hora
+            .then(response => {
+                return res.status(200).json(response);
+            })
+            .catch(error => {
+                return res.status(500).json(error);
+            });
+    }
+
+    async today(req, res){ // tarefas do dia
+        await TaskModel.find({
+            'macaddress': {'$in': req.params.macaddress}, //  vou dar um find pra filtrar pelo macaddress pra mostrar as tarefas somente deste dispositivo
+            'when': {'$gte': startOfDay(current), '$lt' : endOfDay(current)}, // '$gte' maior ou igual pego o primeiro e o ultimo horario do dia pelo date-fns
             })
             .sort('when')
             .then(response => {
@@ -96,24 +112,10 @@ class TaskController {
             });
     }
 
-    async today(req, res){
+    async week(req, res){ // igaul today  mas é por semana
         await TaskModel.find({
             'macaddress': {'$in': req.params.macaddress},
-            'when': {'$gte': startOfDay(current), '$lt' : endOfDay(current)}, // '$gte' maior ou igual
-            })
-            .sort('when')
-            .then(response => {
-                return res.status(200).json(response);
-            })
-            .catch(error => {
-                return res.status(500).json(error);
-            });
-    }
-
-    async week(req, res){
-        await TaskModel.find({
-            'macaddress': {'$in': req.params.macaddress},
-            'when': {'$gte': startOfWeek(current), '$lt' : endOfWeek(current)}, // '$gte' maior ou igual
+            'when': {'$gte': startOfWeek(current), '$lt' : endOfWeek(current)}, // '$gte' maior ou igual - primeiro minuto segundo do dia da semana
             })
             .sort('when')
             .then(response => {
