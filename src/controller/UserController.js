@@ -6,6 +6,7 @@ class UserController {
 
     async create(req, res){
       const user = new UserModel(req.body);
+      user.password = bcrypt.hashSync(req.body.password,10);    
         await user
         .save()
         .then(response => {
@@ -54,7 +55,7 @@ class UserController {
             return res.status(200).json(response);
         })
         .catch(error => {
-            return res.status(500).json(error);
+            return res.status(500).json(error); 
         });
     }
 
@@ -62,15 +63,16 @@ class UserController {
         if (req.body && req.body.user && req.body.password){
             const username = req.body.user;
             const password = req.body.password
-            Usuario.findOne({user: username}, (err, user) => {
+            UserModel.findOne({user: username}, (err, user) => {
                 if(err){
                     res.status(500).send(err);
                 }
-                const validateTrue = bcrypt.compareSync(password, username.password);
-                if(user && validateTrue){
+                const validateTrue = bcrypt.compare(password, username.password);
+                if(req.body.user && validateTrue){
+                    console.log('entrou')
                     const token = jwt.sign({
-                        id: user.id
-                    }, 'teste@teste', {expiresIn: "1h"});
+                        id: req.body.id
+                    }, 'teste@hotmail.com', {expiresIn: "1h"});
                     res.status(201).send({"token":token});
                 }
                 else{
@@ -86,7 +88,7 @@ class UserController {
             res.status(401).send("Nao tem token de acesso");
         }
         else {
-            jwt.verify(token,'Sen@teste',(err,userId) =>{
+            jwt.verify(token,'teste@hotmail.com',(err,userId) =>{
                 if(err){
                     res.status(401).send(err);
                 }
