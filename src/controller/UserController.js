@@ -1,4 +1,6 @@
 const UserModel = require('../model/UserModel');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 class UserController {
 
@@ -56,6 +58,45 @@ class UserController {
         });
     }
 
+    async validateUser(req, res){
+        if (req.body && req.body.user && req.body.password){
+            const username = req.body.user;
+            const password = req.body.password
+            Usuario.findOne({user: username}, (err, user) => {
+                if(err){
+                    res.status(500).send(err);
+                }
+                const validateTrue = bcrypt.compareSync(password, username.password);
+                if(user && validateTrue){
+                    const token = jwt.sign({
+                        id: user.id
+                    }, 'teste@teste', {expiresIn: "1h"});
+                    res.status(201).send({"token":token});
+                }
+                else{
+                    res.status(401).send("Usuario ou senha invalidos");
+                }
+            });
+        }
+    }
+
+    async validateToken(req, res) {
+        const token = req.get("x-auth-token");
+        if(!token) {
+            res.status(401).send("Nao tem token de acesso");
+        }
+        else {
+            jwt.verify(token,'Sen@teste',(err,userId) =>{
+                if(err){
+                    res.status(401).send(err);
+                }
+                else {
+                    console.log("Usuario autorizado: "+userId);
+                    next();
+                }
+            })
+        }
+    }
  
 }
 

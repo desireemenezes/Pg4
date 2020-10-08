@@ -10,4 +10,7 @@ router.get('/:id', UserController.show);
 router.delete('/:id', UserController.delete);
 router.get('/filter/all/:macaddress', UserController.all);
 
+
+router.post('/auth', UserController.validateUser);
+
 module.exports = router;    
