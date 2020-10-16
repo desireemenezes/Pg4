@@ -83,7 +83,8 @@ class UserController {
     }
 
     async validateToken(req, res) {
-        const token = req.get("x-auth-token");
+       // const token = req.get("x-auth-token"); postman
+       const token = req.header.authorization;
         if(!token) {
             res.status(401).send("Nao tem token de acesso");
         }
